@@ -1,0 +1,217 @@
+{
+    "apiVersion": "v1",
+    "kind": "Template",
+    "metadata": {
+        "annotations": {
+            "description": "An example .NET Core application.",
+            "iconClass": "icon-dotnet",
+            "openshift.io/display-name": ".NET Core Example",
+            "tags": "quickstart,dotnet,.net",
+            "template.openshift.io/documentation-url": "https://github.com/redhat-developer/s2i-dotnetcore",
+            "template.openshift.io/provider-display-name": "Red Hat, Inc.",
+            "template.openshift.io/support-url": "https://access.redhat.com"
+        },
+        "name": "dotnet-example"
+    },
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                },
+                "name": "${NAME}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to build the application"
+                },
+                "name": "${NAME}"
+            },
+            "spec": {
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${NAME}:latest"
+                    }
+                },
+                "source": {
+                    "contextDir": "${CONTEXT_DIR}",
+                    "git": {
+                        "ref": "${SOURCE_REPOSITORY_REF}",
+                        "uri": "${SOURCE_REPOSITORY_URL}"
+                    },
+                    "type": "Git"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        },
+                        "type": "GitHub"
+                    },
+                    {
+                        "generic": {
+                            "secret": "${GENERIC_WEBHOOK_SECRET}"
+                        },
+                        "type": "Generic"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to deploy the application server"
+                },
+                "name": "${NAME}"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "name": "${NAME}"
+                },
+                "strategy": {
+                    "type": "Rolling"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "${NAME}"
+                        },
+                        "name": "${NAME}"
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [],
+                                "image": " ",
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 40,
+                                    "timeoutSeconds": 15
+                                },
+                                "name": "dotnet-app",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 10,
+                                    "timeoutSeconds": 30
+                                },
+                                "resources": {
+                                    "limits": {
+                                        "memory": "${MEMORY_LIMIT}"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "triggers": [
+                    {
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "dotnet-app"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "${NAME}:latest"
+                            }
+                        },
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "description": "The name assigned to all of the frontend objects defined in this template.",
+            "displayName": "Name",
+            "name": "NAME",
+            "required": true,
+            "value": "dotnet-example"
+        },
+        {
+            "description": "Maximum amount of memory the container can use.",
+            "displayName": "Memory Limit",
+            "name": "MEMORY_LIMIT",
+            "required": true,
+            "value": "128Mi"
+        },
+        {
+            "description": "The OpenShift Namespace where the ImageStream resides.",
+            "displayName": "Namespace",
+            "name": "NAMESPACE",
+            "required": true,
+            "value": "openshift"
+        },
+        {
+            "description": "The URL of the repository with your application source code.",
+            "displayName": "Git Repository URL",
+            "name": "SOURCE_REPOSITORY_URL",
+            "required": true,
+            "value": "https://github.com/sebekx/test"
+        },
+        {
+            "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch.",
+            "displayName": "Git Reference",
+            "name": "SOURCE_REPOSITORY_REF",
+            "value": ""
+        },
+        {
+            "description": "Set this to use a subdirectory of the source code repository",
+            "displayName": "Context Directory",
+            "name": "CONTEXT_DIR"
+        },
+        {
+            "description": "The exposed hostname that will route to the .NET Core service, if left blank a value will be defaulted.",
+            "displayName": "Application Hostname",
+            "name": "APPLICATION_DOMAIN",
+            "value": ""
+        },
+        {
+            "description": "A secret string used to configure the GitHub webhook.",
+            "displayName": "GitHub Webhook Secret",
+            "from": "[a-zA-Z0-9]{40}",
+            "generate": "expression",
+            "name": "GITHUB_WEBHOOK_SECRET"
+        },
+        {
+            "description": "A secret string used to configure the Generic webhook.",
+            "displayName": "Generic Webhook Secret",
+            "from": "[a-zA-Z0-9]{40}",
+            "generate": "expression",
+            "name": "GENERIC_WEBHOOK_SECRET"
+        }
+    ]
+}

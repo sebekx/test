@@ -22,6 +22,17 @@
                     "description": "Keeps track of changes in the application image"
                 },
                 "name": "${NAME}"
+            },
+            "spec": {
+                "tags": [
+                  {
+                    "from": {
+                      "kind": "DockerImage",
+                      "name": "mcr.microsoft.com/dotnet/core/runtime:3.1-alpine"
+                    },
+                    "name": "latest"
+                  }
+                ]
             }
         },
         {

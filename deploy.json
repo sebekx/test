@@ -25,13 +25,13 @@
             },
             "spec": {
                 "tags": [
-                  {
-                    "from": {
-                      "kind": "DockerImage",
-                      "name": "mcr.microsoft.com/dotnet/core/runtime:3.1-alpine"
-                    },
-                    "name": "latest"
-                  }
+                    {
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "mcr.microsoft.com/dotnet/core/runtime:3.1-alpine"
+                        },
+                        "name": "latest"
+                    }
                 ]
             }
         },
@@ -62,10 +62,10 @@
                 "strategy": {
                     "type": "Docker",
                     "dockerStrategy": {
-                      "from": {
-                        "kind": "ImageStreamTag",
-                        "name": "runtime:3.1-alpine"
-                      }
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "runtime:3.1-alpine"
+                        }
                     }
                 },
                 "triggers": [
@@ -170,15 +170,15 @@
                                         "mountPath": "/data",
                                         "name": "${NAME}-data"
                                     }
-                                ],
-                                "volumes": [
-                                    {
-                                        "name": "${NAME}-data",
-                                        "persistentVolumeClaim": {
-                                            "claimName": "${NAME}"
-                                        }
-                                    }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "${NAME}-data",
+                                "persistentVolumeClaim": {
+                                    "claimName": "${NAME}"
+                                }
                             }
                         ]
                     }

@@ -48,6 +48,15 @@
                     },
                     "type": "Git"
                 },
+                "strategy": {
+                    "type": "Docker",
+                    "dockerStrategy": {
+                      "from": {
+                        "kind": "ImageStreamTag",
+                        "name": "runtime:3.1-alpine"
+                      }
+                    }
+                },
                 "triggers": [
                     {
                         "type": "ImageChange"
@@ -167,13 +176,6 @@
             "name": "MEMORY_LIMIT",
             "required": true,
             "value": "128Mi"
-        },
-        {
-            "description": "The OpenShift Namespace where the ImageStream resides.",
-            "displayName": "Namespace",
-            "name": "NAMESPACE",
-            "required": true,
-            "value": "openshift"
         },
         {
             "description": "The URL of the repository with your application source code.",
